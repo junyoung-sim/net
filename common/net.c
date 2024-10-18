@@ -26,8 +26,8 @@ Net *make_net(
     net->err    = calloc(num_of_layers, sizeof(Vec*));
 
     for(int l = 0; l < num_of_layers; l++) {
-        int n = l != num_of_layers - 1 ? hidden_size : output_size;
-        int i = l == 0 ? input_size : hidden_size;
+        int n = (l != num_of_layers - 1 ? hidden_size : output_size);
+        int i = (l == 0 ? input_size : hidden_size);
 
         net->grad[l]   = make_mat(n, i+1, 0.0f);
         net->weight[l] = make_mat(n, i, 0.0f);
