@@ -61,6 +61,20 @@ void test2() {
     free_vec(b);
 }
 
+void test3() {
+    Net *net = make_net(5, 5, 3, LINEAR, 3);
+
+    dump_mat(net->grad[0]);
+    dump_mat(net->grad[1]);
+    dump_mat(net->grad[2]);
+
+    dump_mat(net->weight[0]);
+    dump_mat(net->weight[1]);
+    dump_mat(net->weight[2]);
+
+    free_net(net);
+}
+
 int main()
 {
     //test0();
@@ -68,6 +82,8 @@ int main()
     //test1();
 
     //test2();
+
+    test3();
 
     return 0;
 }
