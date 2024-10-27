@@ -55,8 +55,16 @@ Net *make_net(
 
 void forward(Net *net, Vec *x, Vec *out) {
     for(int l = 0; l < net->num_of_layers; l++) {
-        mat_vec_product(net->weight[l], (l == 0 ? x : net->act[l]), net->sum[l]);
+        mat_vec_product(net->weight[l], (l == 0 ? x : net->act[l-1]), net->sum[l]);
         vec_sum(net->sum[l], net->bias[l]);
+
+        printf("%d\n", l);
+
+        dump_vec((l == 0 ? x : net->act[l-1]));
+        dump_mat(net->weight[l]);
+        dump_vec(net->sum[l]);
+
+        printf("\n");
     }
 }
 
