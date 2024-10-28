@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <math.h>
 
 #include "net.h"
+
+float rand_normal() {
+    float r1 = (float)(rand() + 0.5f) / (RAND_MAX + 1.0f);
+    float r2 = (float)(rand() + 0.5f) / (RAND_MAX + 1.0f);
+    return sqrt(-2.0f * log(r1)) * sin(2.0f * PI * r2);
+}
 
 void linear(Vec *x, Vec *out) {
     for(int i = 0; i < x->size; i++) {
@@ -14,6 +19,22 @@ void linear(Vec *x, Vec *out) {
 void relu(Vec *x, Vec *out) {
     for(int i = 0; i < x->size; i++) {
         out->dat[i] = (x->dat[i] < 0.0f ? 0.0f : x->dat[i]);
+    }
+}
+
+void sigmoid(Vec *x, Vec *out) {
+    for(int i = 0; i < x->size; i++) {
+        out->dat[i] = 1.0f / (1.0f + exp(-x->dat[i]));
+    }
+}
+
+void softmax(Vec *x, Vec *out) {
+    float norm = 0.0f;
+    for(int i = 0; i < x->size; i++) {
+        norm += exp(x->dat[i]);
+    }
+    for(int i = 0; i < x->size; i++) {
+        out->dat[i] = exp(x->dat[i]) / norm;
     }
 }
 
@@ -51,13 +72,13 @@ Net *make_net(
         net->err[l]    = make_vec(n, 0.0f);
     }
 
-    srand(time(NULL));
     for(int l = 0; l < num_of_layers; l++) {
         int out = (l != num_of_layers - 1 ? hidden_size : output_size);
         int in  = (l == 0 ? input_size : hidden_size);
         for(int n = 0; n < out; n++) {
             for(int i = 0; i < in; i++) {
-                net->weight[l]->dat[n][i] = (float)rand()*2.0f/RAND_MAX-1.0f;
+                float scale = sqrt(2.0f / in);
+                net->weight[l]->dat[n][i] = scale * rand_normal();
             }
         }
     }
@@ -83,8 +104,12 @@ void forward(Net *net, Vec *x, Vec *out) {
         case RELU:
             relu(net->sum[lout], net->act[lout]);
             break;
-        //case LOGISTIC:
-        //case SOFTMAX:
+        case SIGMOID:
+            sigmoid(net->sum[lout], net->act[lout]);
+            break;
+        case SOFTMAX:
+            softmax(net->sum[lout], net->act[lout]);
+            break;
         default:
             linear(net->sum[lout], net->act[lout]);
     }

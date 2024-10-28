@@ -5,19 +5,44 @@
 #include "../common/net.h"
 
 void test() {
-    Net *net = make_net(3, 3, 1, LINEAR, 2);
+    srand(time(NULL));
 
-    Vec *in = make_vec(3, 0.0f);
-    in->dat[0] = (float)rand() / RAND_MAX;
-    in->dat[1] = (float)rand() / RAND_MAX;
-    in->dat[2] = (float)rand() / RAND_MAX;
+    Net *linear  = make_net(10, 10, 3, LINEAR , 3);
+    Net *relu    = make_net(10, 10, 3, RELU   , 3);
+    Net *sigmoid = make_net(10, 10, 3, SIGMOID, 3);
+    Net *softmax = make_net(10, 10, 3, SOFTMAX, 3);
 
-    Vec *out = make_vec(1, 0.0f);
+    Vec *x = make_vec(10, 0.0f);
+    for(int i = 0; i < x->size; i++) {
+        x->dat[i] = rand_normal();
+    }
 
-    forward(net, in, out);
+    dump_vec(x);
 
-    free_net(net);
-    free_vec(in);
+    Vec *out = make_vec(3, 0.0f);
+
+    printf("linear\n");
+    forward(linear, x, out);
+    dump_vec(linear->act[2]);
+
+    printf("\nrelu\n");
+    forward(relu, x, out);
+    dump_vec(relu->act[2]);
+
+    printf("\nsigmoid\n");
+    forward(sigmoid, x, out);
+    dump_vec(sigmoid->act[2]);
+
+    printf("\nsoftmax\n");
+    forward(softmax, x, out);
+    dump_vec(softmax->act[2]);
+
+    free_net(linear);
+    free_net(relu);
+    free_net(sigmoid);
+    free_net(softmax);
+
+    free_vec(x);
     free_vec(out);
 }
 
