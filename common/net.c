@@ -5,6 +5,12 @@
 
 #include "net.h"
 
+void relu(Vec *x, Vec *out) {
+    for(int i = 0; i < x->size; i++) {
+        out->dat[i] = (x->dat[i] < 0.0f ? 0.0f : x->dat[i]);
+    }
+}
+
 Net *make_net(
     int input_size,
     int hidden_size,
@@ -58,13 +64,15 @@ void forward(Net *net, Vec *x, Vec *out) {
         mat_vec_product(net->weight[l], (l == 0 ? x : net->act[l-1]), net->sum[l]);
         vec_sum(net->sum[l], net->bias[l]);
 
-        printf("%d\n", l);
+        if(l == net->num_of_layers - 1) continue;
+        
+        relu(net->sum[l], net->act[l]);
 
+        printf("%d\n", l);
         dump_vec((l == 0 ? x : net->act[l-1]));
         dump_mat(net->weight[l]);
         dump_vec(net->sum[l]);
-
-        printf("\n");
+        dump_vec(net->act[l]);
     }
 }
 

@@ -8,6 +8,8 @@
 #define SIGMOID 2
 #define SOFTMAX 3
 
+void relu(Vec *x, Vec *out);
+
 typedef struct Net Net;
 struct Net
 {
