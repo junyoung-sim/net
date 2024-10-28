@@ -5,6 +5,12 @@
 
 #include "net.h"
 
+void linear(Vec *x, Vec *out) {
+    for(int i = 0; i < x->size; i++) {
+        out->dat[i] = x->dat[i];
+    }
+}
+
 void relu(Vec *x, Vec *out) {
     for(int i = 0; i < x->size; i++) {
         out->dat[i] = (x->dat[i] < 0.0f ? 0.0f : x->dat[i]);
@@ -67,12 +73,20 @@ void forward(Net *net, Vec *x, Vec *out) {
         if(l == net->num_of_layers - 1) continue;
         
         relu(net->sum[l], net->act[l]);
+    }
 
-        printf("%d\n", l);
-        dump_vec((l == 0 ? x : net->act[l-1]));
-        dump_mat(net->weight[l]);
-        dump_vec(net->sum[l]);
-        dump_vec(net->act[l]);
+    int lout = net->num_of_layers - 1;
+    switch(net->output_type) {
+        case LINEAR:
+            linear(net->sum[lout], net->act[lout]);
+            break;
+        case RELU:
+            relu(net->sum[lout], net->act[lout]);
+            break;
+        //case LOGISTIC:
+        //case SOFTMAX:
+        default:
+            linear(net->sum[lout], net->act[lout]);
     }
 }
 

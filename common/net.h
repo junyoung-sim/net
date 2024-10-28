@@ -3,11 +3,12 @@
 
 #include "mat.h"
 
-#define LINEAR  0
-#define RELU    1
-#define SIGMOID 2
-#define SOFTMAX 3
+#define LINEAR   0
+#define RELU     1
+#define LOGISTIC 2
+#define SOFTMAX  3
 
+void linear(Vec *x, Vec *out);
 void relu(Vec *x, Vec *out);
 
 typedef struct Net Net;
