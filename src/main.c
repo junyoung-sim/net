@@ -7,35 +7,35 @@
 void test() {
     srand(time(NULL));
 
-    Net *linear  = make_net(10, 10, 3, LINEAR , 3);
-    Net *relu    = make_net(10, 10, 3, RELU   , 3);
-    Net *sigmoid = make_net(10, 10, 3, SIGMOID, 3);
-    Net *softmax = make_net(10, 10, 3, SOFTMAX, 3);
+    Net *linear  = make_net(100, 100, 5, LINEAR , 10);
+    Net *relu    = make_net(100, 100, 5, RELU   , 10);
+    Net *sigmoid = make_net(100, 100, 5, SIGMOID, 10);
+    Net *softmax = make_net(100, 100, 5, SOFTMAX, 10);
 
-    Vec *x = make_vec(10, 0.0f);
+    Vec *x = make_vec(100, 0.0f);
     for(int i = 0; i < x->size; i++) {
         x->dat[i] = rand_normal();
     }
 
     dump_vec(x);
 
-    Vec *out = make_vec(3, 0.0f);
+    Vec *out = make_vec(5, 0.0f);
 
-    printf("linear\n");
+    printf("\nlinear\n");
     forward(linear, x, out);
-    dump_vec(linear->act[2]);
+    dump_vec(out);
 
     printf("\nrelu\n");
     forward(relu, x, out);
-    dump_vec(relu->act[2]);
+    dump_vec(out);
 
     printf("\nsigmoid\n");
     forward(sigmoid, x, out);
-    dump_vec(sigmoid->act[2]);
+    dump_vec(out);
 
     printf("\nsoftmax\n");
     forward(softmax, x, out);
-    dump_vec(softmax->act[2]);
+    dump_vec(out);
 
     free_net(linear);
     free_net(relu);

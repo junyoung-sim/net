@@ -113,6 +113,10 @@ void forward(Net *net, Vec *x, Vec *out) {
         default:
             linear(net->sum[lout], net->act[lout]);
     }
+
+    for(int i = 0; i < net->output_size; i++) {
+        out->dat[i] = net->act[lout]->dat[i];
+    }
 }
 
 void free_net(Net *net) {
