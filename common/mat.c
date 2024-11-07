@@ -41,6 +41,12 @@ void vec_sum(Vec *vec, Vec *diff) {
     }
 }
 
+void copy_vec(Vec *src, Vec *dst) {
+    for(int i = 0; i < src->size; i++) {
+        dst->dat[i] = src->dat[i];
+    }
+}
+
 void dump_vec(Vec *vec) {
     printf("vec([");
     for(int i = 0; i < vec->size; i++) {

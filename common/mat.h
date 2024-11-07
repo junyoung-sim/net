@@ -21,6 +21,8 @@ Mat *make_mat(int rows, int cols, float init);
 void mat_vec_product(Mat *mat, Vec *vec, Vec *out);
 void vec_sum(Vec *vec, Vec *diff);
 
+void copy_vec(Vec *src, Vec *dst);
+
 void dump_vec(Vec *vec);
 void dump_mat(Mat *mat);
 

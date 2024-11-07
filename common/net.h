@@ -6,9 +6,8 @@
 #define PI 3.141593
 
 #define LINEAR  0
-#define RELU    1
-#define SIGMOID 2
-#define SOFTMAX 3
+#define SIGMOID 1
+#define SOFTMAX 2
 
 float rand_normal();
 
@@ -43,6 +42,8 @@ Net *make_net(
 );
 
 void forward(Net *net, Vec *x, Vec *out);
+
+void backward(Net *net, Vec *x, Vec *y, float alpha, float lambda);
 
 void free_net(Net *net);
 
