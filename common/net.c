@@ -38,18 +38,10 @@ void softmax(Vec *x, Vec *out) {
     }
 }
 
-Net *make_net(
-    int input_size,
-    int hidden_size,
-    int output_size,
-    int output_type,
-    int num_of_layers
-) {
+Net *make_net(int* shape, int num_of_layers, int input_size, int output_type) {
     Net *net = calloc(1, sizeof(Net));
-
+    net->shape         = shape;
     net->input_size    = input_size;
-    net->hidden_size   = hidden_size;
-    net->output_size   = output_size;
     net->output_type   = output_type;
     net->num_of_layers = num_of_layers;
 
@@ -61,8 +53,8 @@ Net *make_net(
     net->err    = calloc(num_of_layers, sizeof(Vec*));
 
     for(int l = 0; l < num_of_layers; l++) {
-        int out = (l != num_of_layers - 1 ? hidden_size : output_size);
-        int in = (l == 0 ? input_size : hidden_size);
+        int out = shape[l];
+        int in  = (l == 0 ? input_size : shape[l-1]);
 
         net->grad[l]   = make_mat(out, in+1, 0.0f);
         net->weight[l] = make_mat(out, in, 0.0f);
@@ -73,8 +65,8 @@ Net *make_net(
     }
 
     for(int l = 0; l < num_of_layers; l++) {
-        int out = (l != num_of_layers - 1 ? hidden_size : output_size);
-        int in  = (l == 0 ? input_size : hidden_size);
+        int out = shape[l];
+        int in  = (l == 0 ? input_size : shape[l-1]);
         for(int n = 0; n < out; n++) {
             for(int i = 0; i < in; i++) {
                 float scale = sqrt(2.0f / in);
@@ -100,12 +92,16 @@ Vec* forward(Net *net, Vec *x) {
     switch(net->output_type) {
         case LINEAR:
             linear(net->sum[lout], net->act[lout]);
+            break;
         case SIGMOID:
             sigmoid(net->sum[lout], net->act[lout]);
+            break;
         case SOFTMAX:
             softmax(net->sum[lout], net->act[lout]);
+            break;
         default:
             linear(net->sum[lout], net->act[lout]);
+            break;
     }
 
     return net->act[lout];

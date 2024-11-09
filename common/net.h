@@ -19,9 +19,8 @@ void softmax(Vec *x, Vec *out);
 typedef struct Net Net;
 struct Net
 {
+    int *shape;
     int input_size;
-    int hidden_size;
-    int output_size;
     int output_type;
     int num_of_layers;
 
@@ -33,13 +32,7 @@ struct Net
     Vec **err;
 };
 
-Net *make_net(
-    int input_size,
-    int hidden_size,
-    int output_size,
-    int output_type,
-    int num_of_layers
-);
+Net *make_net(int* shape, int num_of_layers, int input_size, int output_type);
 
 Vec* forward(Net *net, Vec *x);
 
