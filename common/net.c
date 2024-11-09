@@ -61,15 +61,15 @@ Net *make_net(
     net->err    = calloc(num_of_layers, sizeof(Vec*));
 
     for(int l = 0; l < num_of_layers; l++) {
-        int n = (l != num_of_layers - 1 ? hidden_size : output_size);
-        int i = (l == 0 ? input_size : hidden_size);
+        int out = (l != num_of_layers - 1 ? hidden_size : output_size);
+        int in = (l == 0 ? input_size : hidden_size);
 
-        net->grad[l]   = make_mat(n, i+1, 0.0f);
-        net->weight[l] = make_mat(n, i, 0.0f);
-        net->bias[l]   = make_vec(n, 0.0f);
-        net->sum[l]    = make_vec(n, 0.0f);
-        net->act[l]    = make_vec(n, 0.0f);
-        net->err[l]    = make_vec(n, 0.0f);
+        net->grad[l]   = make_mat(out, in+1, 0.0f);
+        net->weight[l] = make_mat(out, in, 0.0f);
+        net->bias[l]   = make_vec(out, 0.0f);
+        net->sum[l]    = make_vec(out, 0.0f);
+        net->act[l]    = make_vec(out, 0.0f);
+        net->err[l]    = make_vec(out, 0.0f);
     }
 
     for(int l = 0; l < num_of_layers; l++) {
@@ -86,7 +86,7 @@ Net *make_net(
     return net;
 }
 
-void forward(Net *net, Vec *x, Vec *out) {
+Vec* forward(Net *net, Vec *x) {
     for(int l = 0; l < net->num_of_layers; l++) {
         mat_vec_product(net->weight[l], (l == 0 ? x : net->act[l-1]), net->sum[l]);
         vec_sum(net->sum[l], net->bias[l]);
@@ -100,24 +100,18 @@ void forward(Net *net, Vec *x, Vec *out) {
     switch(net->output_type) {
         case LINEAR:
             linear(net->sum[lout], net->act[lout]);
-            break;
         case SIGMOID:
             sigmoid(net->sum[lout], net->act[lout]);
-            break;
         case SOFTMAX:
             softmax(net->sum[lout], net->act[lout]);
-            break;
         default:
             linear(net->sum[lout], net->act[lout]);
     }
 
-    copy_vec(net->act[lout], out);
+    return net->act[lout];
 }
 
 void backward(Net *net, Vec *x, Vec *y, float alpha, float lambda) {
-    Vec *out = make_vec(y->size, 0.0f);
-    forward(net, x, out);
-
 }
 
 /*void MLP::backward(std::vector<float> &x, std::vector<float> &y, float alpha, float lambda) {

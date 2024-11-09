@@ -41,7 +41,7 @@ Net *make_net(
     int num_of_layers
 );
 
-void forward(Net *net, Vec *x, Vec *out);
+Vec* forward(Net *net, Vec *x);
 
 void backward(Net *net, Vec *x, Vec *y, float alpha, float lambda);
 
