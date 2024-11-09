@@ -16,6 +16,8 @@ void relu(Vec *x, Vec *out);
 void sigmoid(Vec *x, Vec *out);
 void softmax(Vec *x, Vec *out);
 
+float drelu(float x);
+
 typedef struct Net Net;
 struct Net
 {
@@ -30,13 +32,26 @@ struct Net
     Vec **sum;
     Vec **act;
     Vec **err;
+
+    int backward_count;
 };
 
-Net *make_net(int* shape, int num_of_layers, int input_size, int output_type);
+Net *make_net(
+    int* shape,
+    int num_of_layers,
+    int input_size,
+    int output_type
+);
 
 Vec* forward(Net *net, Vec *x);
 
-void backward(Net *net, Vec *x, Vec *y, float alpha, float lambda);
+void backward(
+    Net *net,
+    Vec *x,
+    Vec *y,
+    float alpha,
+    float lambda
+);
 
 void free_net(Net *net);
 

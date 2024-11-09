@@ -18,7 +18,7 @@ void linear(Vec *x, Vec *out) {
 
 void relu(Vec *x, Vec *out) {
     for(int i = 0; i < x->size; i++) {
-        out->dat[i] = (x->dat[i] < 0.0f ? 0.0f : x->dat[i]);
+        out->dat[i] = (x->dat[i] <= 0.0f ? 0.0f : x->dat[i]);
     }
 }
 
@@ -38,7 +38,16 @@ void softmax(Vec *x, Vec *out) {
     }
 }
 
-Net *make_net(int* shape, int num_of_layers, int input_size, int output_type) {
+float drelu(float x) {
+    return (x <= 0.0f ? 0.0f : 1.0f);
+}
+
+Net *make_net(
+    int* shape,
+    int num_of_layers,
+    int input_size,
+    int output_type
+    ) {
     Net *net = calloc(1, sizeof(Net));
     net->shape         = shape;
     net->input_size    = input_size;
@@ -52,10 +61,11 @@ Net *make_net(int* shape, int num_of_layers, int input_size, int output_type) {
     net->act    = calloc(num_of_layers, sizeof(Vec*));
     net->err    = calloc(num_of_layers, sizeof(Vec*));
 
+    net->backward_count = 0;
+
     for(int l = 0; l < num_of_layers; l++) {
         int out = shape[l];
         int in  = (l == 0 ? input_size : shape[l-1]);
-
         net->grad[l]   = make_mat(out, in+1, 0.0f);
         net->weight[l] = make_mat(out, in, 0.0f);
         net->bias[l]   = make_vec(out, 0.0f);
@@ -107,42 +117,52 @@ Vec* forward(Net *net, Vec *x) {
     return net->act[lout];
 }
 
-void backward(Net *net, Vec *x, Vec *y, float alpha, float lambda) {
-}
+void backward(
+    Net *net,
+    Vec *x,
+    Vec *y,
+    float alpha,
+    float lambda
+) {
+    Vec *yhat = make_vec(y->size, 0.0f);
+    yhat = forward(net, x);
 
-/*void MLP::backward(std::vector<float> &x, std::vector<float> &y, float alpha, float lambda) {
-    assert(initialized && x.size() == _input_size && y.size() == _shape.back());
-    std::vector<float> out = forward(x);
-    //std::vector<float> ierr(_input_size, 0.0f);
-    for(int l = _shape.size() - 1; l >= 0; l--) {
-        float partial_gradient = 0.0f, full_gradient = 0.0f;
-        unsigned int in_features = (l == 0 ? _input_size : _shape[l-1]);
-        for(unsigned int n = 0; n < _shape[l]; n++) {
-            if(l == _shape.size() - 1) {
-                if(_output_type == "linear") partial_gradient = -2.0f * (y[n] - out[n]);
-                if(_output_type == "sigmoid" || _output_type == "softmax") partial_gradient = out[n] - y[n];
-            }
-            else partial_gradient = _err[l][n] * drelu(_sum[l][n]);
+    //Vec *ierr = make_vec(x->size, 0.0f);
+    for(int l = net->num_of_layers - 1; l >= 0; l--) {
+        float agrad = 0.0f;
+        float wgrad = 0.0f;
 
-            _bias_grad[l][n] += alpha * partial_gradient;
-            for(unsigned int i = 0; i < in_features; i++) {
+        int out = net->shape[l];
+        int in  = (l == 0 ? net->input_size : net->shape[l-1]);
+
+        for(int n = 0; n < out; n++) {
+            if(l == net->num_of_layers - 1)
+                agrad = yhat->dat[n] - y->dat[n];
+            else
+                agrad = net->err[l]->dat[n] * drelu(net->sum[l]->dat[n]);
+
+            net->grad[l]->dat[n][in] += alpha * agrad;
+            
+            for(int i = 0; i < in; i++) {
                 if(l == 0) {
-                    full_gradient = partial_gradient * x[i];
-                    //ierr[i] += partial_gradient * _weight[l][n][i];
+                    wgrad = agrad * x->dat[i];
+                    //ierr->dat[i] += agrad * net->weight[l]->dat[n][i];
                 }
                 else {
-                    full_gradient = partial_gradient * _act[l-1][i];
-                    _err[l-1][i] += partial_gradient * _weight[l][n][i];
+                    wgrad = agrad * net->act[l-1]->dat[i];
+                    net->err[l-1]->dat[i] += agrad * net->weight[l]->dat[n][i];
                 }
-                full_gradient += lambda * _weight[l][n][i];
-                _weight_grad[l][n][i] += alpha * full_gradient;
+                wgrad += lambda * net->weight[l]->dat[n][i];
+                net->grad[l]->dat[n][i] += alpha * wgrad;
             }
         }
     }
-    _backward_count++;
+    net->backward_count++;
+
     //return ierr;
 }
 
+/*
 void MLP::step() {
     assert(initialized && _backward_count != 0);
     for(unsigned int l = 0; l < _shape.size(); l++) {
