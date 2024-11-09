@@ -166,31 +166,31 @@ void backward(
     //return ierr;
 }
 
-/*
-void MLP::step() {
-    assert(initialized && _backward_count != 0);
-    for(unsigned int l = 0; l < _shape.size(); l++) {
-        unsigned int in_features = (l == 0 ? _input_size : _shape[l-1]);
-        for(unsigned int n = 0; n < _shape[l]; n++) {
-            _bias[l][n] -= _bias_grad[l][n] / _backward_count;
-            for(unsigned int i = 0; i < in_features; i++)
-                _weight[l][n][i] -= _weight_grad[l][n][i] / _backward_count;
+void step(Net *net) {
+    for(int l = 0; l < net->num_of_layers; l++) {
+        int out = net->shape[l];
+        int in  = (l == 0 ? net->input_size : net->shape[l-1]);
+        for(int n = 0; n < out; n++) {
+            net->bias[l]->dat[n] -= net->grad[l]->dat[n][in] / net->backward_count;
+            for(int i = 0; i < in; i++) {
+                net->weight[l]->dat[n][i] -= net->grad[l]->dat[n][i] / net->backward_count;
+            }
         }
     }
 }
 
-void MLP::zero_grad() {
-    assert(initialized);
-    for(unsigned int l = 0; l < _shape.size(); l++) {
-        unsigned int in_features = (l == 0 ? _input_size : _shape[l-1]);
-        for(unsigned int n = 0; n < _shape[l]; n++) {
-            _bias_grad[l][n] = 0.0f;
-            for(unsigned int i = 0; i < in_features; i++)
-                _weight_grad[l][n][i] = 0.0f;
+void zero_grad(Net *net) {
+    for(int l = 0; l < net->num_of_layers; l++) {
+        int out = net->shape[l];
+        int in  = (l == 0 ? net->input_size : net->shape[l-1]);
+        for(int n = 0; n < out; n++) {
+            for(int i = 0; i <= in; i++) {
+                net->grad[l]->dat[n][i] = 0.0f;
+            }
         }
     }
-    _backward_count = 0;
-}*/
+    net->backward_count = 0;
+}
 
 void free_net(Net *net) {
     for(int l = 0; l < net->num_of_layers; l++) {

@@ -53,6 +53,10 @@ void backward(
     float lambda
 );
 
+void step(Net *net);
+
+void zero_grad(Net *net);
+
 void free_net(Net *net);
 
 #endif
