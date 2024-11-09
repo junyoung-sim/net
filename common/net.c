@@ -47,7 +47,7 @@ Net *make_net(
     int num_of_layers,
     int input_size,
     int output_type
-    ) {
+) {
     Net *net = calloc(1, sizeof(Net));
     net->shape         = shape;
     net->input_size    = input_size;
@@ -90,7 +90,11 @@ Net *make_net(
 
 Vec* forward(Net *net, Vec *x) {
     for(int l = 0; l < net->num_of_layers; l++) {
-        mat_vec_product(net->weight[l], (l == 0 ? x : net->act[l-1]), net->sum[l]);
+        mat_vec_product(
+            net->weight[l],
+            (l == 0 ? x : net->act[l-1]),
+            net->sum[l]
+        );
         vec_sum(net->sum[l], net->bias[l]);
 
         if(l == net->num_of_layers - 1) continue;
