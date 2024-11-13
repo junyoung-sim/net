@@ -43,7 +43,7 @@ Net *make_net(
     int output_type
 );
 
-Vec* forward(Net *net, Vec *x);
+void forward(Net *net, Vec *x, Vec *out);
 
 void backward(
     Net *net,

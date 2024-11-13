@@ -88,7 +88,7 @@ Net *make_net(
     return net;
 }
 
-Vec* forward(Net *net, Vec *x) {
+void forward(Net *net, Vec *x, Vec *out) {
     for(int l = 0; l < net->num_of_layers; l++) {
         mat_vec_product(
             net->weight[l],
@@ -96,6 +96,11 @@ Vec* forward(Net *net, Vec *x) {
             net->sum[l]
         );
         vec_sum(net->sum[l], net->bias[l]);
+
+        int out = net->shape[l];
+        for(int n = 0; n < out; n++) {
+            net->err[l]->dat[n] = 0.0f;
+        }
 
         if(l == net->num_of_layers - 1) continue;
         
@@ -118,7 +123,9 @@ Vec* forward(Net *net, Vec *x) {
             break;
     }
 
-    return net->act[lout];
+    for(int i = 0; i < out->size; i++) {
+        out->dat[i] = net->act[lout]->dat[i];
+    }
 }
 
 void backward(
@@ -129,9 +136,8 @@ void backward(
     float lambda
 ) {
     Vec *yhat = make_vec(y->size, 0.0f);
-    yhat = forward(net, x);
+    forward(net, x, yhat);
 
-    //Vec *ierr = make_vec(x->size, 0.0f);
     for(int l = net->num_of_layers - 1; l >= 0; l--) {
         float agrad = 0.0f;
         float wgrad = 0.0f;
@@ -140,17 +146,31 @@ void backward(
         int in  = (l == 0 ? net->input_size : net->shape[l-1]);
 
         for(int n = 0; n < out; n++) {
-            if(l == net->num_of_layers - 1)
-                agrad = yhat->dat[n] - y->dat[n];
-            else
+            if(l == net->num_of_layers - 1) {
+                switch(net->output_type) {
+                    case LINEAR:
+                        agrad = y->dat[n] - yhat->dat[n];
+                        break;
+                    case SIGMOID:
+                        agrad = yhat->dat[n] - y->dat[n];
+                        break;
+                    case SOFTMAX:
+                        agrad = yhat->dat[n] - y->dat[n];
+                        break;
+                    default:
+                        agrad = y->dat[n] - yhat->dat[n];
+                        break;
+                }
+            }
+            else {
                 agrad = net->err[l]->dat[n] * drelu(net->sum[l]->dat[n]);
+            }
 
             net->grad[l]->dat[n][in] += alpha * agrad;
             
             for(int i = 0; i < in; i++) {
                 if(l == 0) {
                     wgrad = agrad * x->dat[i];
-                    //ierr->dat[i] += agrad * net->weight[l]->dat[n][i];
                 }
                 else {
                     wgrad = agrad * net->act[l-1]->dat[i];
@@ -162,8 +182,6 @@ void backward(
         }
     }
     net->backward_count++;
-
-    //return ierr;
 }
 
 void step(Net *net) {
@@ -171,9 +189,11 @@ void step(Net *net) {
         int out = net->shape[l];
         int in  = (l == 0 ? net->input_size : net->shape[l-1]);
         for(int n = 0; n < out; n++) {
-            net->bias[l]->dat[n] -= net->grad[l]->dat[n][in] / net->backward_count;
+            float bias_grad = net->grad[l]->dat[n][in] / net->backward_count;
+            net->bias[l]->dat[n] -= bias_grad;
             for(int i = 0; i < in; i++) {
-                net->weight[l]->dat[n][i] -= net->grad[l]->dat[n][i] / net->backward_count;
+                float weight_grad = net->grad[l]->dat[n][i] / net->backward_count;
+                net->weight[l]->dat[n][i] -= weight_grad;
             }
         }
     }
