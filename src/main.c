@@ -12,7 +12,7 @@ int main()
     int INPUT_SIZE    = 100;
     int OUTPUT_SIZE   = 5;
     int NUM_OF_LAYERS = 5;
-    int BATCH_SIZE    = 10;
+    int BATCH_SIZE    = 1;
 
     int shape[NUM_OF_LAYERS];
     shape[0] = 100;
@@ -38,7 +38,7 @@ int main()
     for(int t = 0; t < 10; t++) {
         zero_grad(net);
         for(int i = 0; i < BATCH_SIZE; i++) {
-            backward(net, x[i], y[i], 0.000001f, 0.00001f);
+            backward(net, x[i], y[i], 0.001f, 0.001f);
         }
         step(net);
 

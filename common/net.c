@@ -90,17 +90,19 @@ Net *make_net(
 
 void forward(Net *net, Vec *x, Vec *out) {
     for(int l = 0; l < net->num_of_layers; l++) {
+        int out = net->shape[l];
+        for(int n = 0; n < out; n++) {
+            net->sum[l]->dat[n] = 0.0f;
+            net->act[l]->dat[n] = 0.0f;
+            net->err[l]->dat[n] = 0.0f;
+        }
+
         mat_vec_product(
             net->weight[l],
             (l == 0 ? x : net->act[l-1]),
             net->sum[l]
         );
         vec_sum(net->sum[l], net->bias[l]);
-
-        int out = net->shape[l];
-        for(int n = 0; n < out; n++) {
-            net->err[l]->dat[n] = 0.0f;
-        }
 
         if(l == net->num_of_layers - 1) continue;
         
@@ -147,7 +149,7 @@ void backward(
 
         for(int n = 0; n < out; n++) {
             if(l == net->num_of_layers - 1) {
-                switch(net->output_type) {
+                /*switch(net->output_type) {
                     case LINEAR:
                         agrad = y->dat[n] - yhat->dat[n];
                         break;
@@ -160,7 +162,8 @@ void backward(
                     default:
                         agrad = y->dat[n] - yhat->dat[n];
                         break;
-                }
+                }*/
+               agrad = yhat->dat[n] - y->dat[n];
             }
             else {
                 agrad = net->err[l]->dat[n] * drelu(net->sum[l]->dat[n]);
