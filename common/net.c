@@ -149,7 +149,7 @@ void backward(
 
         for(int n = 0; n < out; n++) {
             if(l == net->num_of_layers - 1) {
-                /*switch(net->output_type) {
+                switch(net->output_type) {
                     case LINEAR:
                         agrad = y->dat[n] - yhat->dat[n];
                         break;
@@ -162,8 +162,7 @@ void backward(
                     default:
                         agrad = y->dat[n] - yhat->dat[n];
                         break;
-                }*/
-               agrad = yhat->dat[n] - y->dat[n];
+                }
             }
             else {
                 agrad = net->err[l]->dat[n] * drelu(net->sum[l]->dat[n]);
