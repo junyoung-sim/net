@@ -111,18 +111,9 @@ void forward(Net *net, Vec *x, Vec *out) {
 
     int lout = net->num_of_layers - 1;
     switch(net->output_type) {
-        case LINEAR:
-            linear(net->sum[lout], net->act[lout]);
-            break;
-        case SIGMOID:
-            sigmoid(net->sum[lout], net->act[lout]);
-            break;
-        case SOFTMAX:
-            softmax(net->sum[lout], net->act[lout]);
-            break;
-        default:
-            linear(net->sum[lout], net->act[lout]);
-            break;
+        case LINEAR : linear(net->sum[lout], net->act[lout]);
+        case SIGMOID: sigmoid(net->sum[lout], net->act[lout]);
+        case SOFTMAX: softmax(net->sum[lout], net->act[lout]);
     }
 
     for(int i = 0; i < out->size; i++) {
@@ -150,18 +141,9 @@ void backward(
         for(int n = 0; n < out; n++) {
             if(l == net->num_of_layers - 1) {
                 switch(net->output_type) {
-                    case LINEAR:
-                        agrad = y->dat[n] - yhat->dat[n];
-                        break;
-                    case SIGMOID:
-                        agrad = yhat->dat[n] - y->dat[n];
-                        break;
-                    case SOFTMAX:
-                        agrad = yhat->dat[n] - y->dat[n];
-                        break;
-                    default:
-                        agrad = y->dat[n] - yhat->dat[n];
-                        break;
+                    case LINEAR : agrad = y->dat[n] - yhat->dat[n];
+                    case SIGMOID: agrad = yhat->dat[n] - y->dat[n];
+                    case SOFTMAX: agrad = yhat->dat[n] - y->dat[n];
                 }
             }
             else {
