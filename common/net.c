@@ -191,11 +191,11 @@ void step(Net *net) {
         int out = net->shape[l];
         int in  = (l == 0 ? net->input_size : net->shape[l-1]);
         for(int n = 0; n < out; n++) {
-            float bias_grad = net->grad[l]->dat[n][in] / net->backward_count;
-            net->bias[l]->dat[n] -= bias_grad;
+            float bgrad = net->grad[l]->dat[n][in] / net->backward_count;
+            net->bias[l]->dat[n] -= bgrad;
             for(int i = 0; i < in; i++) {
-                float weight_grad = net->grad[l]->dat[n][i] / net->backward_count;
-                net->weight[l]->dat[n][i] -= weight_grad;
+                float wgrad = net->grad[l]->dat[n][i] / net->backward_count;
+                net->weight[l]->dat[n][i] -= wgrad;
             }
         }
     }
