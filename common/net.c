@@ -10,25 +10,25 @@ float rand_normal() {
     return sqrt(-2.0f * log(r1)) * sin(2.0f * PI * r2);
 }
 
-void linear(Vec *x, Vec *out) {
+void linear(Vec* x, Vec* out) {
     for(int i = 0; i < x->size; i++) {
         out->dat[i] = x->dat[i];
     }
 }
 
-void relu(Vec *x, Vec *out) {
+void relu(Vec* x, Vec* out) {
     for(int i = 0; i < x->size; i++) {
         out->dat[i] = (x->dat[i] <= 0.0f ? 0.0f : x->dat[i]);
     }
 }
 
-void sigmoid(Vec *x, Vec *out) {
+void sigmoid(Vec* x, Vec* out) {
     for(int i = 0; i < x->size; i++) {
         out->dat[i] = 1.0f / (1.0f + exp(-x->dat[i]));
     }
 }
 
-void softmax(Vec *x, Vec *out) {
+void softmax(Vec* x, Vec* out) {
     float norm = 0.0f;
     for(int i = 0; i < x->size; i++) {
         norm += exp(x->dat[i]);
@@ -42,13 +42,13 @@ float drelu(float x) {
     return (x <= 0.0f ? 0.0f : 1.0f);
 }
 
-Net *make_net(
+Net* make_net(
     int* shape,
     int num_of_layers,
     int input_size,
     int output_type
 ) {
-    Net *net = calloc(1, sizeof(Net));
+    Net* net = calloc(1, sizeof(Net));
     net->shape         = shape;
     net->input_size    = input_size;
     net->output_type   = output_type;
@@ -88,7 +88,7 @@ Net *make_net(
     return net;
 }
 
-void forward(Net *net, Vec *x, Vec *out) {
+void forward(Net* net, Vec* x, Vec* out) {
     for(int l = 0; l < net->num_of_layers; l++) {
         int out = net->shape[l];
         for(int n = 0; n < out; n++) {
@@ -122,13 +122,13 @@ void forward(Net *net, Vec *x, Vec *out) {
 }
 
 void backward(
-    Net *net,
-    Vec *x,
-    Vec *y,
+    Net* net,
+    Vec* x,
+    Vec* y,
     float alpha,
     float lambda
 ) {
-    Vec *yhat = make_vec(y->size, 0.0f);
+    Vec* yhat = make_vec(y->size, 0.0f);
     forward(net, x, yhat);
 
     for(int l = net->num_of_layers - 1; l >= 0; l--) {
@@ -168,7 +168,7 @@ void backward(
     net->backward_count++;
 }
 
-void step(Net *net) {
+void step(Net* net) {
     for(int l = 0; l < net->num_of_layers; l++) {
         int out = net->shape[l];
         int in  = (l == 0 ? net->input_size : net->shape[l-1]);
@@ -183,7 +183,7 @@ void step(Net *net) {
     }
 }
 
-void zero_grad(Net *net) {
+void zero_grad(Net* net) {
     for(int l = 0; l < net->num_of_layers; l++) {
         int out = net->shape[l];
         int in  = (l == 0 ? net->input_size : net->shape[l-1]);
@@ -196,7 +196,7 @@ void zero_grad(Net *net) {
     net->backward_count = 0;
 }
 
-void free_net(Net *net) {
+void free_net(Net* net) {
     for(int l = 0; l < net->num_of_layers; l++) {
         free_mat(net->grad[l]);
         free_mat(net->weight[l]);

@@ -21,10 +21,10 @@ int main()
     shape[3] = 100;
     shape[4] = OUTPUT_SIZE;
 
-    Net *net = make_net(shape, NUM_OF_LAYERS, INPUT_SIZE, SOFTMAX);
+    Net* net = make_net(shape, NUM_OF_LAYERS, INPUT_SIZE, SOFTMAX);
 
-    Vec **x   = calloc(BATCH_SIZE, sizeof(Vec*));
-    Vec **y   = calloc(BATCH_SIZE, sizeof(Vec*));
+    Vec** x = calloc(BATCH_SIZE, sizeof(Vec*));
+    Vec** y = calloc(BATCH_SIZE, sizeof(Vec*));
 
     for(int i = 0; i < BATCH_SIZE; i++) {
         x[i] = make_vec(INPUT_SIZE,  0.0f);
@@ -42,7 +42,7 @@ int main()
         }
         step(net);
 
-        Vec *yhat = make_vec(OUTPUT_SIZE, 0.0f);
+        Vec* yhat = make_vec(OUTPUT_SIZE, 0.0f);
 
         float batch_loss = 0.0f;
         for(int i = 0; i < BATCH_SIZE; i++) {
