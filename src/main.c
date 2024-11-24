@@ -11,15 +11,14 @@ int main()
     
     int INPUT_SIZE    = 100;
     int OUTPUT_SIZE   = 5;
-    int NUM_OF_LAYERS = 5;
-    int BATCH_SIZE    = 1;
+    int NUM_OF_LAYERS = 10;
+    int BATCH_SIZE    = 10;
 
     int shape[NUM_OF_LAYERS];
-    shape[0] = 100;
-    shape[1] = 100;
-    shape[2] = 100;
-    shape[3] = 100;
-    shape[4] = OUTPUT_SIZE;
+    for(int i = 0; i < NUM_OF_LAYERS-1; i++) {
+        shape[i] = 100;
+    }
+    shape[NUM_OF_LAYERS-1] = OUTPUT_SIZE;
 
     Net* net = make_net(shape, NUM_OF_LAYERS, INPUT_SIZE, SOFTMAX);
 
@@ -35,12 +34,14 @@ int main()
         y[i]->dat[rand() % OUTPUT_SIZE] = 1.0f;
     }
 
-    for(int t = 0; t < 10; t++) {
+    for(int t = 1; t <= 10000; t++) {
         zero_grad(net);
         for(int i = 0; i < BATCH_SIZE; i++) {
             backward(net, x[i], y[i], 0.001f, 0.001f);
         }
         step(net);
+
+        if(t % 1000) continue;
 
         Vec* yhat = make_vec(OUTPUT_SIZE, 0.0f);
 
