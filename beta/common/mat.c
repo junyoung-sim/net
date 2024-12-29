@@ -108,3 +108,34 @@ void free_mat
   free(mat);
 
 }
+
+//==========================================================
+// Operations
+//==========================================================
+
+void mat_vec_product
+(
+  Mat* mat,
+  Vec* vec,
+  Vec* out
+) {
+
+  for(int i = 0; i < mat->size[0]; i++) {
+    for(int j = 0; j < mat->size[1]; j++) {
+      out->dat[i] += mat->dat[i][j] * vec->dat[j];
+    }
+  }
+
+}
+
+void vec_sum
+(
+  Vec* vec, 
+  Vec* diff
+) {
+
+  for(int i = 0; i < vec->size; i++) {
+    vec->dat[i] += diff->dat[i];
+  }
+
+}
