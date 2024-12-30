@@ -8,3 +8,5 @@ make && ./exec
 ```
 
 ![alt text](https://github.com/junyoung-sim/net/blob/main/etc/result.png)
+
+Dell XPS 15 9520 (Intel i7-12700H)
