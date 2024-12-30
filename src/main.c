@@ -1,76 +1,108 @@
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include <math.h>
 
 #include "../common/net.h"
 
-int main()
+int main(int argc, char *argv[])
 {
-    srand(time(NULL));
-    
-    int INPUT_SIZE    = 100;
-    int OUTPUT_SIZE   = 5;
-    int NUM_OF_LAYERS = 10;
-    int BATCH_SIZE    = 10;
+  srand(time(NULL));
+  printf("\n");
 
-    int shape[NUM_OF_LAYERS];
-    for(int i = 0; i < NUM_OF_LAYERS-1; i++) {
-        shape[i] = 100;
-    }
-    shape[NUM_OF_LAYERS-1] = OUTPUT_SIZE;
+  //==========================================================
+  // Generate Random I/O
+  //==========================================================
 
-    Net* net = make_net(shape, NUM_OF_LAYERS, INPUT_SIZE, SOFTMAX);
+  Vec* x = make_vec(10000, 0.0f);
+  for(int i = 0; i < 10000; i++) {
+    x->dat[i] = rand_normal();
+  }
 
-    Vec** x = calloc(BATCH_SIZE, sizeof(Vec*));
-    Vec** y = calloc(BATCH_SIZE, sizeof(Vec*));
+  Vec* y = make_vec(10, 0.0f);
+  y->dat[rand() % 10] = 1.0f;
 
-    for(int i = 0; i < BATCH_SIZE; i++) {
-        x[i] = make_vec(INPUT_SIZE,  0.0f);
-        y[i] = make_vec(OUTPUT_SIZE, 0.0f);
-        for(int j = 0; j < INPUT_SIZE; j++) {
-            x[i]->dat[j] = rand_normal();
-        }
-        y[i]->dat[rand() % OUTPUT_SIZE] = 1.0f;
-    }
+  Vec* yhat = make_vec(10, 0.0f);
 
-    for(int t = 1; t <= 10000; t++) {
-        zero_grad(net);
-        for(int i = 0; i < BATCH_SIZE; i++) {
-            backward(net, x[i], y[i], 0.001f, 0.001f);
-        }
-        step(net);
+  //==========================================================
+  // Model Initialization (1B+)
+  //==========================================================
 
-        if(t % 1000) continue;
+  int shape[10];
+  shape[0] = 10000;
+  shape[1] = 10000;
+  shape[2] = 10000;
+  shape[3] = 10000;
+  shape[4] = 10000;
+  shape[5] = 10000;
+  shape[6] = 10000;
+  shape[7] = 10000;
+  shape[8] = 10000;
+  shape[9] = 10;
 
-        Vec* yhat = make_vec(OUTPUT_SIZE, 0.0f);
+  Net* net;
+  
+  clock_t init_t0 = clock();
+  {
+    net = make_net(shape, 10, 10000, SOFTMAX);
+  }
+  clock_t init_tf = clock();
 
-        float batch_loss = 0.0f;
-        for(int i = 0; i < BATCH_SIZE; i++) {
-            forward(net, x[i], yhat);
-            float loss = 0.0f;
-            for(int j = 0; j < OUTPUT_SIZE; j++) {
-                loss += -1.0f * y[i]->dat[j] * log(yhat->dat[j]);
-            }
-            batch_loss += loss;
-        }
-        batch_loss /= BATCH_SIZE;
+  //==========================================================
+  // Forward Pass
+  //==========================================================
 
-        printf("t=%d L=%f\n", t, batch_loss);
+  clock_t forward_t0 = clock();
+  {
+    forward(net, x, yhat);
+    dump_vec(yhat);
+    printf("\nLoss = %f\n\n", cross_entropy(y, yhat));
+  }
+  clock_t forward_tf = clock();
 
-        free_vec(yhat);
-    }
+  //==========================================================
+  // Backward Pass
+  //==========================================================
 
-    //---------------------------------------------------------------
+  clock_t backward_t0 = clock();
+  {
+    zero_grad(net);
+    backward(net, x, y, 0.001, 0.001);
+    step(net);
+  }
+  clock_t backward_tf = clock();
 
-    free_net(net);
+  forward(net, x, yhat);
+  dump_vec(yhat);
+  printf("\nLoss = %f\n\n", cross_entropy(y, yhat));
 
-    for(int i = 0; i < BATCH_SIZE; i++) {
-        free_vec(x[i]);
-        free_vec(y[i]);
-    }
-    free(x);
-    free(y);
+  //==========================================================
+  // Report Timing
+  //==========================================================
 
-    return 0;
+  clock_t init_dt_c = init_tf - init_t0;
+  float   init_dt_s = (float)init_dt_c / CLOCKS_PER_SEC;
+
+  clock_t forward_dt_c = forward_tf - forward_t0;
+  float   forward_dt_s = (float)forward_dt_c / CLOCKS_PER_SEC;
+
+  clock_t backward_dt_c = backward_tf - backward_t0;
+  float   backward_dt_s = (float)backward_dt_c / CLOCKS_PER_SEC;
+
+  printf("Init.    (s): %f\n", init_dt_s);
+  printf("Forward  (s): %f\n", forward_dt_s);
+  printf("Backward (s): %f\n", backward_dt_s);
+  printf("\n");
+
+  //==========================================================
+  // Free Memory
+  //==========================================================
+
+  free_vec(x);
+  free_vec(y);
+  free_vec(yhat);
+
+  free_net(net);
+
+  return 0;
+
 }
