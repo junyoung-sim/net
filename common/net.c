@@ -242,10 +242,7 @@ void backward
           net->err[l-1]->dat[i] += agrad * weight;
         }
 
-        sgrad = net->act[l-1]->dat[i];
-        if(l == 0) {
-          sgrad = x->dat[i];
-        }
+        sgrad = (l == 0 ? x->dat[i] : net->act[l-1]->dat[i]);
 
         wgrad  = agrad * sgrad;
         wgrad += lambda * weight;
