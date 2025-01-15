@@ -57,10 +57,10 @@ float cross_entropy
 typedef struct Net Net;
 struct Net
 {
-  int* shape;
-  int input_size;
-  int output_type;
-  int num_of_layers;
+  int*  shape;
+  int   input_size;
+  int   output_type;
+  int   num_of_layers;
 
   Mat** grad;
   Mat** weight;
@@ -74,10 +74,10 @@ struct Net
 
 Net* make_net
 (
-  int *shape,
-  int num_of_layers,
-  int input_size,
-  int output_type
+  int* shape,
+  int  num_of_layers,
+  int  input_size,
+  int  output_type
 );
 
 void forward
@@ -89,9 +89,9 @@ void forward
 
 void backward
 (
-  Net* net,
-  Vec* x,
-  Vec* y,
+  Net*  net,
+  Vec*  x,
+  Vec*  y,
   float alpha,
   float lambda
 );

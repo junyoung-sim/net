@@ -100,10 +100,10 @@ float cross_entropy
 
 Net* make_net
 (
-  int *shape,
-  int num_of_layers,
-  int input_size,
-  int output_type
+  int* shape,
+  int  num_of_layers,
+  int  input_size,
+  int  output_type
 ) {
 
   Net* net = (Net*)malloc(sizeof(Net));
@@ -201,9 +201,9 @@ void forward
 
 void backward
 (
-  Net* net,
-  Vec* x,
-  Vec* y,
+  Net*  net,
+  Vec*  x,
+  Vec*  y,
   float alpha,
   float lambda
 ) {

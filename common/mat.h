@@ -8,13 +8,13 @@
 typedef struct Vec Vec;
 struct Vec
 {
-  int size;
+  int    size;
   float* dat;
 };
 
 Vec* make_vec
 (
-  int size,
+  int   size,
   float init
 );
 
@@ -35,14 +35,14 @@ void free_vec
 typedef struct Mat Mat;
 struct Mat
 {
-  int size[2];
+  int     size[2];
   float** dat;
 };
 
 Mat* make_mat
 (
-  int rows,
-  int cols,
+  int   rows,
+  int   cols,
   float init
 );
 

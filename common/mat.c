@@ -9,7 +9,7 @@
 
 Vec* make_vec
 (
-  int size,
+  int   size,
   float init
 ) {
 
@@ -56,8 +56,8 @@ void free_vec
 
 Mat* make_mat
 (
-  int rows,
-  int cols,
+  int   rows,
+  int   cols,
   float init
 ) {
 
