@@ -238,11 +238,11 @@ void backward
       for(int i = 0; i < in; i++) {
         
         weight = net->weight[l]->dat[n][i];
-        if(l != 0) {
+        if(l > 0) {
           net->err[l-1]->dat[i] += agrad * weight;
         }
 
-        sgrad = (l == 0 ? x->dat[i] : net->act[l-1]->dat[i]);
+        sgrad = (l > 0 ? net->act[l-1]->dat[i] : x->dat[i]);
 
         wgrad  = agrad * sgrad;
         wgrad += lambda * weight;
